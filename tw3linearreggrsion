@@ -1,0 +1,14 @@
+data = readmatrix('swedish_insurance.csv');
+X = data(:, 1);
+y = data(:, 2);
+model = fitlm(X, y);
+disp(model);
+figure;
+plot(model);
+xlabel('Feature');
+ylabel('Target');
+title('Linear Regression using fitlm()');
+grid on;
+x_new = 6;
+y_pred = predict(model, x_new);
+fprintf('Prediction for x = %.2f: y = %.2f\n', x_new, y_pred);
