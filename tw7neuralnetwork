@@ -1,0 +1,54 @@
+% step 1: Load the data
+data = readtable('Stock_data.csv');  % Ensure the file is in MATLAB path
+closePrices = data.Close;
+
+% STEP 2: Normalize the closing prices
+minPrice = min(closePrices);
+maxPrice = max(closePrices);
+normalizedPrices = (closePrices - minPrice) / (maxPrice - minPrice);
+
+% STEP 3: Create input and target vectors for time-series prediction
+% Use previous day's price to predict current day
+inputs = normalizedPrices(1:end-1)';
+targets = normalizedPrices(2:end)';
+
+% STEP 4: Create and train a shallow neural network
+net = fitnet(10);  % 10 neurons in the hidden layer
+net.trainParam.epochs = 200;
+net.divideParam.trainRatio = 0.7;
+net.divideParam.valRatio = 0.15;
+net.divideParam.testRatio = 0.15;
+
+[net, tr] = train(net, inputs, targets);
+
+% STEP 5: Test the network and evaluate performance
+outputs = net(inputs);
+performance = perform(net, targets, outputs);
+
+% Convert outputs back to actual prices
+predictedPrices = outputs * (maxPrice - minPrice) + minPrice;
+actualPrices = targets * (maxPrice - minPrice) + minPrice;
+
+% STEP 6: Plot actual vs predicted prices
+figure;
+plot(predictedPrices, 'r', 'LineWidth', 1.2);
+hold on;
+plot(actualPrices, 'b--', 'LineWidth', 1.2);
+legend('Predicted', 'Actual');
+xlabel('Day');
+ylabel('Price');
+title('Stock Closing Price Prediction using Neural Network');
+grid on;
+
+% when using neural networks for regression tasks like stock price prediction, 
+% common performance/accuracy metrics include:Mean Squared Error (MSE),
+% Root Mean Squared Error (RMSE) Mean Absolute Error(MAE) R-squared (Coefficient of Determination)
+
+mse_value = perform(net, targets, outputs);
+fprintf('Mean Squared Error (MSE): %.4f\n', mse_value);rmse = sqrt(mean((outputs - targets).^2));
+fprintf('Root Mean Squared Error (RMSE): %.4f\n', rmse);rmse_actual = sqrt(mean((predictedPrices - actualPrices).^2));
+fprintf('RMSE (actual prices): %.4f\n', rmse_actual);mae = mean(abs(predictedPrices - actualPrices));
+fprintf('Mean Absolute Error (MAE): %.4f\n', mae);SS_res = sum((actualPrices - predictedPrices).^2);
+SS_tot = sum((actualPrices - mean(actualPrices)).^2);
+R_squared = 1 - (SS_res / SS_tot);
+fprintf('R-squared: %.4f\n', R_squared);
