@@ -1,0 +1,27 @@
+% Step 1: Load dataset
+filename = 'wine_dataset_for_hiearchical_clusterig.csv';
+data = readtable(filename);
+% Step 2: Normalize features
+X = zscore(table2array(data))
+% Step 3: Compute pairwise distances
+distances = pdist(X, 'euclidean');
+% Step 4: Create linkage matrix using Ward method
+Z = linkage(distances, 'ward'); % Alternatives: 'single', 'complete'
+% Step 5: Plot dendrogram
+figure;
+dendrogram(Z);
+title('Agglomerative Hierarchical Clustering (Ward)');
+xlabel('Sample Index');
+ylabel('Distance');
+% Step 6: Cophenetic Correlation Coefficient
+cophCorr = cophenet(Z, distances);
+fprintf('Cophenetic Correlation Coefficient: %.4f\n', cophCorr);
+% Step 7: Assign cluster labels (e.g., 3 clusters)
+numClusters = 3;
+clusterLabels = cluster(Z, 'maxclust', numClusters);
+% Step 8: Silhouette Analysis
+figure;
+silhouette(X, clusterLabels);
+title('Silhouette Plot - Agglomerative Clustering');
+avgSilhouette = mean(silhouette(X, clusterLabels));
+fprintf('Average Silhouette Score: %.4f\n', avgSilhouette);
