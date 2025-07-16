@@ -1,0 +1,28 @@
+function divisiveClustering(X, clusterNames, depth)
+if nargin < 2
+clusterNames = {'Root'};
+depth = 0;
+end
+% Base case: stop if too few samples
+if size(X,1) <= 2
+fprintf('%s%s: Leaf Cluster with %d samples\n', repmat(' ',1,depth), clusterNames{1}, size(X,1));
+return;
+end
+% Split cluster using K-Means (K=2)
+[idx, ~] = kmeans(X, 2);
+for i = 1:2
+subCluster = X(idx == i, :);
+newName = sprintf('%s-%d', clusterNames{1}, i);
+fprintf('%s%s: %d samples\n', repmat(' ',1,depth), newName, size(subCluster,1));
+% Recursive call
+divisiveClustering(subCluster, {newName}, depth + 1);
+end
+end
+% Main Script
+% Load and normalize data
+filename = 'wine_dataset_for_hiearchical_clusterig.csv';
+data = readtable(filename);
+X = zscore(table2array(data));
+% Run Divisive Clustering
+fprintf('Divisive Hierarchical Clustering (Recursive K-Means)\n');
+divisiveClustering(X);
