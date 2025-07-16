@@ -1,0 +1,25 @@
+clear; clc;
+% Step 1: Load dataset
+filename = 'Copy_of_Mall_Customers.csv-Mall_Customers.csv';
+data = readtable(filename);
+% Step 2: Preprocess Gender column
+genderNumeric = double(data.Gender == "Male"); % Male = 1, Female = 0
+% Step 3: Create feature matrix
+X = [genderNumeric, data.Age, data.Annual_Income, data.Spending_Score];
+% Step 4: Apply K-Means clustering
+k = 5;
+[idx, C] = kmeans(X, k);
+% Step 5: Visualize the clusters
+figure;
+gscatter(X(:, 3), X(:, 4), idx); % Income vs Spending Score
+hold on;
+plot(C(:, 3), C(:, 4), 'kx', 'MarkerSize', 15, 'LineWidth', 2);
+xlabel('Annual Income (k$)');
+ylabel('Spending Score (1–100)');
+title('K-Means Clustering of Mall Customers');
+legend('Cluster 1','Cluster 2','Cluster 3','Cluster 4','Cluster 5','Centroids');
+grid on;
+% Step 6: Predict for a new customer
+newCustomer = [1, 35, 70, 80]; % Example: Male, 35 years, $70k income, score 80
+predictedCluster = knnsearch(C, newCustomer);
+fprintf('The new customer is assigned to Cluster %d.\n', predictedCluster);
