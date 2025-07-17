@@ -1,0 +1,68 @@
+% Linear Regression on a dataset using Normal Equation
+
+% This reads the CSV file into a matrix.
+% Each row is a data point.
+% Column 1 = input feature, Column 2 = target output.
+% Step 1: Load Dataset (assume CSV with two columns: Feature, Target)
+
+data = readmatrix('C:\Users\HP\OneDrive\Desktop\Academic year 2024-25\EVEN SEMESTER\AIML\UNIT 2\Datasets\swedish_insurance.csv');   
+
+%data = readmatrix('swedishinsurance2.xls') ;
+X = data(:, 1);   % Feature column
+y = data(:, 2);   % Target/output column
+m = length(y);    % Number of training examples
+
+% This adds a column of 1s to `X` to account for the **intercept term**.
+% Now `X_b` has two columns:
+  % 1. A column of ones (for intercept)
+  % 2. The original feature `X`
+
+% Step 2: Add intercept term
+X_b = [ones(m, 1), X];   % Augmented feature matrix
+
+% Step 3: Compute theta using Normal Equation
+theta = inv(X_b' * X_b) * X_b' * y;
+
+% Display the learned parameters
+% Intercept (θ₀) ; Slope (θ₁)
+
+fprintf('Learned parameters:\n');
+disp(theta);
+fprintf('Estimated Slope: %.4f\n', theta(2));
+fprintf('Estimated Intercept: %.4f\n', theta(1));
+
+%This computes the predicted output using the learned linear model: y^=θ0+θ1x
+
+% Step 4: Predict values
+y_pred = X_b * theta;
+
+% Step 5: Plot origial data and regression line
+% Blue circles (`bo`) for original data
+% Red line (`r-`) for the fitted regression line
+figure;
+plot(X, y, 'bo', 'MarkerSize', 7);      % Original data
+hold on;
+plot(X, y_pred, 'r-', 'LineWidth', 2);  % Regression line
+
+
+% Plot prediction at x = 10
+X_new = [1, 10];
+Y_new_pred = X_new * theta;
+
+%plot(X_new, Y_new_pred, 'gs', 'MarkerSize', 7, 'MarkerFaceColor', 'g');
+plot(X_new, Y_new_pred, 'gs', 'MarkerSize', 12);
+
+xlabel('Feature');
+ylabel('Target');
+title('Linear Regression Fit');
+legend('Training data', 'Linear regression');
+grid on;
+Y_new_pred = X_new * theta;
+%plot(X_new, Y_new_pred, 'gs', 'MarkerSize', 7, 'MarkerFaceColor', 'g');
+plot(X_new, Y_new_pred, 'gs', 'MarkerSize', 12);
+
+xlabel('Feature');
+ylabel('Target');
+title('Linear Regression Fit');
+legend('Training data', 'Linear regression');
+grid on;
